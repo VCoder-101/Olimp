@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Автомастерская — прототип (375px)</title>
+<style>
+  /* Основная обёртка фиксированной ширины 375px (как в задании) */
+  :root{
+    --surface:#ffffff;
+    --on-surface:#1f2937;
+    --primary:#6750a4; /* Material 3-ish */
+    --on-primary:#ffffff;
+    --secondary:#625b71;
+    --error:#b00020;
+    --radius:14px;
+    --elevation: 0 8px 24px rgba(16,24,40,0.12);
+    font-family: Inter, Roboto, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  body{
+    background: linear-gradient(180deg,#f6f7fb 0%, #eef2ff 100%);
+    display:flex;
+    justify-content:center;
+    padding:20px;
+    min-height:100vh;
+    margin:0;
+  }
+  .phone {
+    width:375px;
+    background:var(--surface);
+    border-radius:20px;
+    box-shadow: 0 10px 30px rgba(16,24,40,0.12);
+    overflow:hidden;
+    min-height:667px;
+    display:flex;
+    flex-direction:column;
+  }
+  header.appbar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 16px;
+    border-bottom:1px solid rgba(16,24,40,0.04);
+  }
+  .brand {
+    display:flex;
+    flex-direction:column;
+  }
+  .brand .title{font-weight:700; color:var(--on-surface);}
+  .brand .subtitle{font-size:12px;color:var(--secondary);}
+  main{
+    padding:16px;
+    flex:1;
+    overflow:auto;
+  }
+
+  /* Card */
+  .card{
+    background:linear-gradient(180deg, #fff 0%, #fbfbff 100%);
+    border-radius:var(--radius);
+    box-shadow:var(--elevation);
+    padding:16px;
+    margin-bottom:12px;
+  }
+
+  /* Form */
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  label{font-size:13px;color:var(--secondary);}
+  input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select {
+    padding:12px 12px;
+    border-radius:10px;
+    border:1px solid rgba(16,24,40,0.08);
+    outline:none;
+    font-size:15px;
+  }
+  input:focus{box-shadow:0 4px 10px rgba(103,80,164,0.08);border-color:var(--primary);}
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 14px;
+    border-radius:12px;
+    font-weight:600;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{background:var(--primary); color:var(--on-primary); box-shadow: 0 6px 18px rgba(103,80,164,0.18);}
+  .btn-outline{background:transparent;border:1px solid rgba(16,24,40,0.06); color:var(--on-surface);}
+  .muted{color:var(--secondary);font-size:13px}
+
+  .row{display:flex;gap:8px;align-items:center;}
+  .space-between{display:flex;justify-content:space-between;align-items:center;}
+
+  /* Small components */
+  .car-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:1px solid rgba(16,24,40,0.04);}
+  .chip{padding:6px 10px;border-radius:999px;border:1px solid rgba(16,24,40,0.06);font-size:13px;}
+  .danger{color:var(--error);font-weight:600;}
+  .error-text{color:var(--error);font-size:13px;margin-top:6px;}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.28);display:none;align-items:center;justify-content:center;}
+  .modal{width:340px;background:white;border-radius:14px;padding:14px;box-shadow:0 12px 36px rgba(16,24,40,0.28);}
+  .modal.show{display:block;}
+
+  /* Tiny flow diagram */
+  .flow{
+    padding:10px;
+    background:linear-gradient(90deg,#fff,#fbfbff);
+    border-radius:12px;
+    margin-bottom:12px;
+  }
+  /* footer */
+  footer{padding:12px 16px;border-top:1px solid rgba(16,24,40,0.04);font-size:13px;color:var(--secondary)}
+  a.link{color:var(--primary);text-decoration:none;font-weight:600}
+
+  /* small responsive tweaks */
+  @media (max-width: 420px){
+    body{padding:8px}
+    .phone{transform:scale(0.96)}
+  }
+</style>
+</head>
+<body>
+  <div class="phone" role="application" aria-label="Прототип автомастерской">
+    <header class="appbar">
+      <div style="width:44px;height:44px;background:linear-gradient(180deg,#7f66b8,#4a2e84);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700">AM</div>
+      <div class="brand">
+        <div class="title">Автомастерская</div>
+        <div class="subtitle">Web-дизайн — прототип</div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Flow diagram (простая схема экранов + стрелки) -->
+      <div class="flow card" aria-hidden="true">
+        <svg width="100%" viewBox="0 0 340 80" preserveAspectRatio="xMidYMid meet">
+          <!-- boxes -->
+          <rect x="6" y="12" rx="8" ry="8" width="84" height="42" fill="#fff" stroke="#e6e2f2"></rect>
+          <text x="48" y="38" font-size="12" text-anchor="middle" fill="#3b3b47">Вход</text>
+
+          <rect x="122" y="12" rx="8" ry="8" width="84" height="42" fill="#fff" stroke="#e6e2f2"></rect>
+          <text x="164" y="38" font-size="12" text-anchor="middle" fill="#3b3b47">Регистрация</text>
+
+          <rect x="238" y="12" rx="8" ry="8" width="84" height="42" fill="#fff" stroke="#e6e2f2"></rect>
+          <text x="280" y="38" font-size="12" text-anchor="middle" fill="#3b3b47">Главная</text>
+
+          <!-- arrows -->
+          <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#7f66b8"/></marker></defs>
+          <line x1="90" y1="33" x2="122" y2="33" stroke="#b9b0e6" stroke-width="2" marker-end="url(#arrow)"/>
+          <line x1="206" y1="33" x2="238" y2="33" stroke="#b9b0e6" stroke-width="2" marker-end="url(#arrow)"/>
+        </svg>
+        <div class="muted" style="margin-top:8px">Ширина экрана: 375px. Покажите путь от входа до главной страницы.</div>
+      </div>
+
+      <!-- LOGIN SCREEN -->
+      <section id="screen-login" class="card" role="region" aria-labelledby="login-title">
+        <h3 id="login-title">Вход в аккаунт</h3>
+        <p class="muted">Используйте email или телефон и пароль</p>
+
+        <div id="login-error" class="error-text" style="display:none"></div>
+
+        <div class="form-group">
+          <label for="login-identifier">Email или телефон</label>
+          <input id="login-identifier" type="text" autocomplete="username" placeholder="ivan@example.com or +7 900 000 0000">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Пароль</label>
+          <input id="login-password" type="password" autocomplete="current-password" placeholder="Пароль">
+        </div>
+
+        <div class="row" style="justify-content:space-between;align-items:center;margin-top:6px;">
+          <button id="btn-login" class="btn btn-primary">Войти</button>
+          <a href="#" id="link-forgot" class="muted">Забыли пароль?</a>
+        </div>
+
+        <div style="margin-top:12px" class="space-between">
+          <div class="muted">Нет аккаунта?</div>
+          <button id="link-register" class="btn btn-outline">Зарегистрироваться</button>
+        </div>
+      </section>
+
+      <!-- REGISTER SCREEN (hidden by default) -->
+      <section id="screen-register" class="card" role="region" aria-labelledby="register-title" style="display:none">
+        <h3 id="register-title">Создать аккаунт</h3>
+        <p class="muted">Укажите имя, город, телефон, email и пароль</p>
+
+        <div id="register-error" class="error-text" style="display:none"></div>
+
+        <div class="form-group">
+          <label for="reg-name">Имя</label>
+          <input id="reg-name" type="text" placeholder="Иван Иванов">
+        </div>
+        <div class="form-group">
+          <label for="reg-city">Город обслуживания</label>
+          <input id="reg-city" type="text" placeholder="Москва">
+        </div>
+        <div class="form-group">
+          <label for="reg-phone">Телефон</label>
+          <input id="reg-phone" type="tel" placeholder="+7 900 000 0000">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" placeholder="ivan@example.com">
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Пароль</label>
+          <input id="reg-password" type="password" placeholder="Придумайте пароль">
+        </div>
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <button id="btn-register" class="btn btn-primary">Зарегистрироваться</button>
+          <button id="btn-register-cancel" class="btn btn-outline">Отмена</button>
+        </div>
+      </section>
+
+      <!-- FORGOT PASSWORD SCREEN -->
+      <section id="screen-forgot" class="card" role="region" aria-labelledby="forgot-title" style="display:none">
+        <h3 id="forgot-title">Восстановление пароля</h3>
+        <p class="muted">Введите телефон или email — мы отправим новый пароль</p>
+
+        <div id="forgot-error" class="error-text" style="display:none"></div>
+
+        <div class="form-group">
+          <label for="forgot-identifier">Телефон или Email</label>
+          <input id="forgot-identifier" type="text" placeholder="+7... или email">
+        </div>
+        <div class="row" style="justify-content:space-between;">
+          <button id="btn-forgot" class="btn btn-primary">Отправить</button>
+          <button id="btn-forgot-cancel" class="btn btn-outline">Отмена</button>
+        </div>
+      </section>
+
+      <!-- MAIN SCREEN -->
+      <section id="screen-main" class="card" role="region" aria-labelledby="main-title" style="display:none">
+        <div class="space-between" style="align-items:flex-start;">
+          <div>
+            <h3 id="main-title" style="margin:0">Мои автомобили</h3>
+            <div class="muted" id="user-greeting" style="margin-top:6px">Привет, Гость</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Поддержка</div>
+            <button id="btn-call" class="btn btn-outline" style="margin-top:6px">Заказать звонок</button>
+            <div style="margin-top:6px"><button id="btn-chat" class="btn btn-outline">Связаться</button></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" id="cars-list">
+          <!-- Список машин -->
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <button id="btn-add-car" class="btn btn-primary">Добавить автомобиль</button>
+          <button id="btn-new-request" class="btn btn-outline">Создать заявку</button>
+        </div>
+
+        <div style="margin-top:12px" class="card" aria-live="polite">
+          <div style="font-weight:700">Информация о заявках</div>
+          <div class="muted" style="margin-top:8px">Здесь будут отображаться статусы: ТО, диагностика, малярные работы и т.д.</div>
+          <div style="margin-top:8px">
+            <!-- Примеры заявок (статичные) -->
+            <div class="chip" style="margin-bottom:6px">№123 — Диагностика — В работе</div>
+            <div class="chip">№98 — Малярные работы — Ожидает запчасти</div>
+          </div>
+        </div>
+
+        <div style="margin-top:10px" class="muted">Вы можете добавлять/удалять автомобили. Процессы создания заявок не реализованы (только интерфейс).</div>
+
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <button id="btn-logout" class="btn btn-outline">Выйти</button>
+          <div class="muted" style="font-size:12px">Версия прототипа • 1.0</div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Использован стиль, вдохновлённый Material Design 3.0. Прототип демонстрирует последовательность экранов и основные взаимодействия. 
+    </footer>
+  </div>
+
+  <!-- Modal for add car & create request -->
+  <div id="modal-back" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal" id="modal-content">
+      <!-- content injected by JS -->
+    </div>
+  </div>
+
+<script>
+/* ======= Простая логика экранов и симуляция аккаунта через localStorage ======= */
+
+/*
+Data model in localStorage:
+- 'am_user' : {name, city, phone, email, password}
+- 'am_cars' : [{id, make, model, plate}]
+*/
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function show(screenId){
+  ['screen-login','screen-register','screen-forgot','screen-main']
+    .forEach(id => document.getElementById(id).style.display = (id === screenId) ? '' : 'none');
+}
+
+/* Utility validators */
+function isEmail(str){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str); }
+function isPhone(str){ return /^\+?\d[\d\s\-]{6,}$/.test(str); }
+
+/* Load user if exists */
+function getUser(){ try{return JSON.parse(localStorage.getItem('am_user'))}catch(e){return null}}
+function setUser(u){ localStorage.setItem('am_user', JSON.stringify(u)) }
+function clearUser(){ localStorage.removeItem('am_user') }
+function getCars(){ try{return JSON.parse(localStorage.getItem('am_cars')||'[]')}catch(e){return []}}
+function setCars(c){ localStorage.setItem('am_cars', JSON.stringify(c)) }
+
+/* --- Handlers for LOGIN --- */
+$('#btn-login').addEventListener('click', () => {
+  const id = $('#login-identifier').value.trim();
+  const pw = $('#login-password').value;
+  const err = $('#login-error');
+  err.style.display='none';
+
+  const user = getUser();
+  if(!user){ err.textContent='Аккаунт не найден. Зарегистрируйтесь.'; err.style.display='block'; return; }
+
+  if( (id === user.email || id === user.phone) && pw === user.password ){
+    // success
+    renderMain();
+    show('screen-main');
+  } else {
+    err.textContent='Неверный логин или пароль. Проверьте введённые данные.';
+    err.style.display='block';
+  }
+});
+
+/* links */
+$('#link-register').addEventListener('click', ()=> {
+  $('#register-error').style.display='none';
+  show('screen-register');
+});
+$('#btn-register-cancel').addEventListener('click', ()=> show('screen-login'));
+
+$('#link-forgot').addEventListener('click', ()=> {
+  $('#forgot-error').style.display='none';
+  show('screen-forgot');
+});
+$('#btn-forgot-cancel').addEventListener('click', ()=> show('screen-login'));
+
+/* --- REGISTER --- */
+$('#btn-register').addEventListener('click', ()=>{
+  const name = $('#reg-name').value.trim();
+  const city = $('#reg-city').value.trim();
+  const phone = $('#reg-phone').value.trim();
+  const email = $('#reg-email').value.trim();
+  const pw = $('#reg-password').value;
+  const err = $('#register-error');
+  err.style.display='none';
+
+  if(!name || !city || !phone || !email || !pw){
+    err.textContent='Заполните все поля.';
+    err.style.display='block';
+    return;
+  }
+  if(!isEmail(email) && !isPhone(email)){
+    // allow email OR phone for email field? We'll require email to be proper
+    err.textContent='Некорректный email.';
+    err.style.display='block';
+    return;
+  }
+  if(!isPhone(phone)){
+    err.textContent='Некорректный телефон.';
+    err.style.display='block';
+    return;
+  }
+
+  // store user
+  setUser({name, city, phone, email, password: pw});
+  // seed cars array empty
+  setCars([]);
+  alert('Аккаунт создан. Вы автоматически вошли.');
+  renderMain();
+  show('screen-main');
+});
+
+/* --- FORGOT PASSWORD --- */
+$('#btn-forgot').addEventListener('click', ()=>{
+  const id = $('#forgot-identifier').value.trim();
+  const err = $('#forgot-error');
+  err.style.display='none';
+  const user = getUser();
+  if(!user){ err.textContent='Аккаунт не найден.'; err.style.display='block'; return; }
+
+  if(id === user.email || id === user.phone){
+    // generate new simple password and update
+    const newpw = Math.random().toString(36).slice(-8);
+    user.password = newpw;
+    setUser(user);
+    // Simulate sending email/SMS
+    alert('Новый пароль отправлен на указанный контакт: ' + newpw + '\n(В реальном приложении будет отправлено письмо/смс.)');
+    show('screen-login');
+  } else {
+    err.textContent='Указанный email/телефон не совпадает с зарегистрированным аккаунтом.';
+    err.style.display='block';
+  }
+});
+
+/* --- MAIN --- */
+function renderMain(){
+  const user = getUser();
+  $('#user-greeting').textContent = user ? `Привет, ${user.name}` : 'Привет, Гость';
+  renderCars();
+}
+
+function renderCars(){
+  const cars = getCars();
+  const container = $('#cars-list');
+  container.innerHTML = '';
+  if(cars.length === 0){
+    container.innerHTML = '<div class="muted">Список автомобилей пуст. Добавьте автомобиль.</div>';
+    return;
+  }
+  cars.forEach(car => {
+    const div = document.createElement('div');
+    div.className = 'car-item';
+    div.innerHTML = `
+      <div style="width:56px;height:40px;background:linear-gradient(90deg,#e7e0f7,#f4f1ff);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#3b2b67">${car.make[0]||'A'}</div>
+      <div style="flex:1">
+        <div style="font-weight:700">${car.make} ${car.model}</div>
+        <div class="muted" style="font-size:13px">${car.plate}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <button class="btn btn-outline btn-view" data-id="${car.id}" style="padding:8px 10px;font-size:13px">Подробнее</button>
+        <button class="btn" style="padding:8px 10px;background:#fff;border:1px solid rgba(16,24,40,0.06);border-radius:10px;color:#b00020" data-id="${car.id}" onclick="removeCar('${car.id}')">Удалить</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+/* Add Car modal */
+$('#btn-add-car').addEventListener('click', ()=>{
+  showModal(`<h4 style="margin:0 0 8px 0">Добавить автомобиль</h4>
+    <div class="form-group"><label>Марка</label><input id="m-make" type="text" placeholder="Toyota"></div>
+    <div class="form-group"><label>Модель</label><input id="m-model" type="text" placeholder="Camry"></div>
+    <div class="form-group"><label>Гос. номер</label><input id="m-plate" type="text" placeholder="А000АА77"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="m-add" class="btn btn-primary">Добавить</button>
+      <button id="m-cancel" class="btn btn-outline">Отмена</button>
+    </div>`, () => {
+      $('#m-cancel').addEventListener('click', hideModal);
+      $('#m-add').addEventListener('click', ()=>{
+        const make = $('#m-make').value.trim();
+        const model = $('#m-model').value.trim();
+        const plate = $('#m-plate').value.trim();
+        if(!make||!model||!plate){ alert('Заполните все поля'); return; }
+        const cars = getCars();
+        const id = Date.now().toString(36);
+        cars.push({id, make, model, plate});
+        setCars(cars);
+        hideModal();
+        renderCars();
+      });
+  });
+});
+
+/* Create request modal (UI only) */
+$('#btn-new-request').addEventListener('click', ()=>{
+  showModal(`<h4 style="margin:0 0 8px 0">Новая заявка</h4>
+    <div class="form-group"><label>Выберите автомобиль</label>
+      <select id="req-car">${getCars().map(c=>`<option value="${c.id}">${c.make} ${c.model} — ${c.plate}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>Тип услуги</label>
+      <select id="req-type"><option>Техническое обслуживание</option><option>Диагностика</option><option>Малярные работы</option></select>
+    </div>
+    <div class="form-group"><label>Краткое описание</label><input id="req-desc" placeholder="Опишите проблему"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="req-send" class="btn btn-primary">Отправить</button>
+      <button id="req-cancel" class="btn btn-outline">Отмена</button>
+    </div>`, ()=> {
+      $('#req-cancel').addEventListener('click', hideModal);
+      $('#req-send').addEventListener('click', ()=>{
+        // just UI: show confirmation
+        const sel = $('#req-type').value;
+        alert('Заявка отправлена: ' + sel + '\nВ реальном приложении будет создана запись и отправлено уведомление.');
+        hideModal();
+      });
+  });
+});
+
+/* Support buttons */
+$('#btn-call').addEventListener('click', ()=> {
+  alert('Оформление запроса на звонок. Телефон службы поддержки: +7 900 111 22 33');
+});
+$('#btn-chat').addEventListener('click', ()=> {
+  alert('Открыт чат поддержки (в прототипе — имитация).');
+});
+
+/* Logout */
+$('#btn-logout').addEventListener('click', ()=> {
+  // keep user but navigate to login
+  show('screen-login');
+});
+
+/* Modal helpers */
+function showModal(html, onShow){
+  const back = $('#modal-back');
+  const content = $('#modal-content');
+  content.innerHTML = html;
+  back.style.display = 'flex';
+  // attach simple close on backdrop
+  back.onclick = function(e){
+    if(e.target === back) hideModal();
+  };
+  if(onShow) onShow();
+}
+function hideModal(){
+  const back = $('#modal-back');
+  back.style.display = 'none';
+  back.onclick = null;
+}
+
+/* remove car function (called inline) */
+function removeCar(id){
+  if(!confirm('Удалить автомобиль?')) return;
+  let cars = getCars();
+  cars = cars.filter(c=>c.id !== id);
+  setCars(cars);
+  renderCars();
+}
+
+/* init: if user exists, go to main, else login */
+(function init(){
+  if(getUser()){
+    renderMain();
+    show('screen-main');
+  } else {
+    show('screen-login');
+  }
+})();
+
+/* Accessibility: keyboard 'Enter' on login fields triggers login */
+$('#login-password').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') $('#btn-login').click();
+});
+</script>
+</body>
+</html>
